@@ -1,0 +1,21 @@
+.mapContainer
+  min-width: 600px
+  min-height: 600px
+  border: 5px solid #dddddd
+  transform: rotate(-90deg)
+
+.mapGrid
+  display: grid
+  grid-auto-flow: row
+  grid-gap: 1px
+
+.mapGrid::before
+  content: ''
+  width: 0
+  padding-bottom: 100%
+  grid-row: 1 / 1
+  grid-column: 1 / 1
+
+.mapGrid > *:first-child
+  grid-row: 1 / 1
+  grid-column: 1 / 1
