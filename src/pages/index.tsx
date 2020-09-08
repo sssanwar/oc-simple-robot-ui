@@ -13,9 +13,13 @@ import {
 import { useEffect, useState } from 'react'
 import { FootprintData } from '../lib/interfaces/model.interface'
 import InfoPanel from '../components/infopanel'
+import Overlay from '../components/overlay'
+import { parseSecondLineCommand } from 'oc-simple-robot/src/lib/common/utils'
 
-const mapWidth = 100
-const mapHeight = 100
+const mapWidth = 30
+const mapHeight = 30
+
+const cellDiameterPx = 600 / mapHeight // 600 is max height in pixel
 const map: MapService = new ModelWorldMap(mapWidth, mapHeight)
 const engine = new GameEngine(map)
 
@@ -35,6 +39,11 @@ export default function IndexPage() {
       setRobotData(robotLocData)
       setFootprints(fprints)
     }
+  }
+
+  const onSendCommand = (input: string) => {
+    const cmds = parseSecondLineCommand(input)
+    cmds?.forEach(cmd => engine.sendCommand(cmd))
   }
 
   const keydownListener = (ev: KeyboardEvent) => {
@@ -62,10 +71,24 @@ export default function IndexPage() {
     <div className={styles.main}>
       <div>
         <h3>Simple Robot UI</h3>
-        <WorldMap width={mapWidth} height={mapHeight} footprints={footprints} />
+        <p>Use these arrow keys to move robot: UP (Forward) and LEFT/RIGHT (Rotate)</p>
+        <div className={styles.mapContainer}>
+          <WorldMap width={mapWidth} height={mapHeight} cellDiameterPx={cellDiameterPx} />
+          {footprints.map(fp => {
+            return (
+              <Overlay
+                key={fp.occupierId}
+                mapWidth={mapWidth}
+                mapHeight={mapHeight}
+                cellDiameterPx={cellDiameterPx}
+                footprintData={fp}
+              />
+            )
+          })}
+        </div>
       </div>
       <div className={styles.infopanel}>
-        <InfoPanel location={robotData} />
+        <InfoPanel location={robotData} onSendCommand={onSendCommand} />
       </div>
     </div>
   )
