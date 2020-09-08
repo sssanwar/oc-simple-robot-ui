@@ -16,8 +16,8 @@ import InfoPanel from '../components/infopanel'
 import Overlay from '../components/overlay'
 import { parseSecondLineCommand } from 'oc-simple-robot/src/lib/common/utils'
 
-const mapWidth = 30
-const mapHeight = 30
+const mapWidth = 20
+const mapHeight = 20
 
 const cellDiameterPx = 600 / mapHeight // 600 is max height in pixel
 const map: MapService = new ModelWorldMap(mapWidth, mapHeight)
