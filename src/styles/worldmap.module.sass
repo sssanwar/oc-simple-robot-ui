@@ -1,23 +1,14 @@
+$grid-color: #cdf3fd
+
 .mapGrid
-  display: grid
-  grid-auto-flow: row
-  grid-gap: 1px
-  border: 5px solid #dddddd
+  border: 5px solid $grid-color
   position: absolute
-  top: 0
-  left: 0
-  transform: rotate(-90deg)
-
-.mapGrid::before
-  content: ''
-  width: 0
-  padding-bottom: 100%
-  grid-row: 1 / 1
-  grid-column: 1 / 1
-
-.mapGrid > *:first-child
-  grid-row: 1 / 1
-  grid-column: 1 / 1
+  display: flex
+  flex-wrap: wrap
+  flex-direction: column-reverse
 
 .cell
-  box-shadow: 0 0 0 1px #dddddd
+  display: inline-block
+  box-sizing: border-box
+  border-left: 1px solid $grid-color
+  border-bottom: 1px solid $grid-color

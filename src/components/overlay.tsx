@@ -36,8 +36,8 @@ export default function Overlay(props: OverlayProps) {
       <div
         className={styles.occupier}
         style={{
-          transform: `rotate(${fp.direction ? fp.direction + 90 : 90}deg)`,
-          gridArea: `${fp.coordinates[0].x + occpSize.x} / ${fp.coordinates[0].y + occpSize.y}`
+          transform: `rotate(${fp.direction}deg)`,
+          gridArea: `${mapHeight - (fp.coordinates[0].y + occpSize.y - 1)} / ${fp.coordinates[0].x + occpSize.x}`
         }}
       />
     </div>

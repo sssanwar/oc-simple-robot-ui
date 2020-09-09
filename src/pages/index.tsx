@@ -5,7 +5,6 @@ import styles from '../styles/index.module.sass'
 
 import {
   CompassPoint,
-  MapService,
   OccupierLocationData,
   RobotLocationData,
   ActionType
@@ -16,16 +15,17 @@ import InfoPanel from '../components/infopanel'
 import Overlay from '../components/overlay'
 import { parseSecondLineCommand, wait } from 'oc-simple-robot/src/lib/common/utils'
 
-const mapWidth = 20
-const mapHeight = 20
-const cmdDelay = 500
-const cellDiameterPx = 600 / mapHeight // 600 is max height in pixel
-const map: MapService = new ModelWorldMap(mapWidth, mapHeight)
-const engine = new GameEngine(map)
-
 export default function IndexPage() {
+  const MAP_WIDTH = 30
+  const MAP_HEIGHT = 20
+  const GRID_WIDTH_PX = 800
+  const DELAY = 500
+  const CELL_SIZE_PX = GRID_WIDTH_PX / MAP_WIDTH
+
   const [footprints, setFootprints] = useState<FootprintData[]>([])
   const [robotData, setRobotData] = useState<RobotLocationData>()
+  const [map] = useState(new ModelWorldMap(MAP_WIDTH, MAP_HEIGHT))
+  const [engine] = useState(new GameEngine(map))
 
   const updateFootprints = (locationData: OccupierLocationData) => {
     const robotLocData = locationData as RobotLocationData
@@ -44,7 +44,7 @@ export default function IndexPage() {
   const onSendCommand = async (input: string) => {
     if (input.trim().length === 0) return
     const cmds = parseSecondLineCommand(input)!
-    const cmdWaits = cmds.map(cmd => () => wait(cmdDelay).then(() => engine.sendCommand(cmd)))
+    const cmdWaits = cmds.map(cmd => () => wait(DELAY).then(() => engine.sendCommand(cmd)))
     for (const cw of cmdWaits) await cw()
   }
 
@@ -66,28 +66,31 @@ export default function IndexPage() {
   }
 
   useEffect(() => {
-    engine.asObservable().subscribe(locationData => updateFootprints(locationData))
+    const engineSubs = engine.asObservable().subscribe(locationData => updateFootprints(locationData))
     engine.init({ position: { x: 0, y: 0 }, compassPoint: CompassPoint.N })
     window.addEventListener('keydown', keydownListener)
-    return () => window.removeEventListener('keydown', keydownListener)
+    return () => {
+      engineSubs.unsubscribe()
+      window.removeEventListener('keydown', keydownListener)
+    }
   }, [])
 
   return (
     <div className={styles.main}>
       <div>
-        <h2>
-          Simple Robot UI ({mapWidth} x {mapHeight})
+        <h2 style={{ minWidth: GRID_WIDTH_PX }}>
+          Simple Robot UI ({MAP_WIDTH} x {MAP_HEIGHT})
         </h2>
         <p>Use arrow keys to move: UP (Forward) and LEFT/RIGHT (Rotate)</p>
         <div className={styles.mapContainer}>
-          <WorldMap width={mapWidth} height={mapHeight} cellDiameterPx={cellDiameterPx} />
+          <WorldMap width={MAP_WIDTH} height={MAP_HEIGHT} cellDiameterPx={CELL_SIZE_PX} />
           {footprints.map(fp => {
             return (
               <Overlay
                 key={fp.occupierId}
-                mapWidth={mapWidth}
-                mapHeight={mapHeight}
-                cellDiameterPx={cellDiameterPx}
+                mapWidth={MAP_WIDTH}
+                mapHeight={MAP_HEIGHT}
+                cellDiameterPx={CELL_SIZE_PX}
                 footprintData={fp}
               />
             )
@@ -95,7 +98,7 @@ export default function IndexPage() {
         </div>
       </div>
       <div className={styles.infopanel}>
-        <InfoPanel location={robotData} cmdDelay={cmdDelay} onSendCommand={onSendCommand} />
+        <InfoPanel location={robotData} cmdDelay={DELAY} onSendCommand={onSendCommand} />
       </div>
     </div>
   )

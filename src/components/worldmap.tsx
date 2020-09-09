@@ -20,7 +20,17 @@ export default function WorldMap(props: WorldMapProps) {
       }}>
       {new Array(width)
         .fill(null)
-        .map((_, x) => new Array(height).fill(null).map((_, y) => <span className={styles.cell} key={`${x}-${y}`} />))}
+        .map((_, x) =>
+          new Array(height)
+            .fill(null)
+            .map((_, y) => (
+              <span
+                className={styles.cell}
+                key={`${x}-${y}`}
+                style={{ width: cellDiameterPx, height: cellDiameterPx }}
+              />
+            ))
+        )}
     </div>
   )
 }
