@@ -18,7 +18,7 @@ import { parseSecondLineCommand, wait } from 'oc-simple-robot/src/lib/common/uti
 export default function IndexPage() {
   const MAP_WIDTH = 30
   const MAP_HEIGHT = 20
-  const GRID_WIDTH_PX = 800
+  const GRID_WIDTH_PX = 700
   const DELAY = 500
   const CELL_SIZE_PX = GRID_WIDTH_PX / MAP_WIDTH
 
