@@ -78,11 +78,11 @@ export default function IndexPage() {
   return (
     <div className={styles.main}>
       <div>
-        <h2 style={{ minWidth: GRID_WIDTH_PX }}>
+        <h2>
           Simple Robot UI ({MAP_WIDTH} x {MAP_HEIGHT})
         </h2>
         <p>Use arrow keys to move: UP (Forward) and LEFT/RIGHT (Rotate)</p>
-        <div className={styles.mapContainer}>
+        <div className={styles.mapContainer} style={{ minWidth: GRID_WIDTH_PX }}>
           <WorldMap width={MAP_WIDTH} height={MAP_HEIGHT} cellDiameterPx={CELL_SIZE_PX} />
           {footprints.map(fp => {
             return (
