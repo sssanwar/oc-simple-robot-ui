@@ -4,21 +4,16 @@ import { useState, ChangeEvent } from 'react'
 
 interface InfoPanelProps {
   location?: RobotLocationData
+  cmdDelay: number
   onSendCommand: (input: string) => void
 }
 
 export default function InfoPanel(props: InfoPanelProps) {
-  const { location, onSendCommand } = props
-  const [cmdString, setCmdString] = useState<string>('')
+  const { location, cmdDelay, onSendCommand } = props
+  const [cmdString, setCmdString] = useState<string>('M1RM4L3M2')
 
-  const handleInputChange = (ev: ChangeEvent<HTMLTextAreaElement>) => {
-    setCmdString(ev.target.value)
-    onSendCommand(ev.target.value)
-  }
-
-  const handleReset = () => {
-    setCmdString('')
-  }
+  const handleInputChange = (ev: ChangeEvent<HTMLTextAreaElement>) => setCmdString(ev.target.value)
+  const handleSend = () => onSendCommand(cmdString)
 
   return (
     <div className={styles.infopanel}>
@@ -31,9 +26,9 @@ export default function InfoPanel(props: InfoPanelProps) {
       <p>
         <label>Compass:</label> {location ? CompassPoint[location.compassPoint] : '-'}
       </p>
-      <label className={styles.inputCommand}>Input Commands:</label>
-      <textarea cols={60} rows={10} value={cmdString} onChange={handleInputChange} />
-      <button onClick={handleReset}>Clear</button>
+      <label className={styles.inputCommand}>Input Commands ({cmdDelay}ms delay):</label>
+      <textarea cols={50} rows={10} value={cmdString} onChange={handleInputChange} />
+      <button onClick={handleSend}>Send</button>
     </div>
   )
 }

@@ -14,11 +14,11 @@ import { useEffect, useState } from 'react'
 import { FootprintData } from '../lib/interfaces/model.interface'
 import InfoPanel from '../components/infopanel'
 import Overlay from '../components/overlay'
-import { parseSecondLineCommand } from 'oc-simple-robot/src/lib/common/utils'
+import { parseSecondLineCommand, wait } from 'oc-simple-robot/src/lib/common/utils'
 
 const mapWidth = 20
 const mapHeight = 20
-
+const cmdDelay = 500
 const cellDiameterPx = 600 / mapHeight // 600 is max height in pixel
 const map: MapService = new ModelWorldMap(mapWidth, mapHeight)
 const engine = new GameEngine(map)
@@ -41,21 +41,26 @@ export default function IndexPage() {
     }
   }
 
-  const onSendCommand = (input: string) => {
-    const cmds = parseSecondLineCommand(input)
-    cmds?.forEach(cmd => engine.sendCommand(cmd))
+  const onSendCommand = async (input: string) => {
+    if (input.trim().length === 0) return
+    const cmds = parseSecondLineCommand(input)!
+    const cmdWaits = cmds.map(cmd => () => wait(cmdDelay).then(() => engine.sendCommand(cmd)))
+    for (const cw of cmdWaits) await cw()
   }
 
   const keydownListener = (ev: KeyboardEvent) => {
     switch (ev.keyCode) {
       case 38: // up
         engine.sendCommand({ id: robotData?.id, type: ActionType.M, count: 1 })
+        ev.preventDefault()
         break
       case 37: // left
         engine.sendCommand({ id: robotData?.id, type: ActionType.L, count: 1 })
+        ev.preventDefault()
         break
       case 39: // right
         engine.sendCommand({ id: robotData?.id, type: ActionType.R, count: 1 })
+        ev.preventDefault()
         break
     }
   }
@@ -70,8 +75,10 @@ export default function IndexPage() {
   return (
     <div className={styles.main}>
       <div>
-        <h3>Simple Robot UI</h3>
-        <p>Use these arrow keys to move robot: UP (Forward) and LEFT/RIGHT (Rotate)</p>
+        <h2>
+          Simple Robot UI ({mapWidth} x {mapHeight})
+        </h2>
+        <p>Use arrow keys to move: UP (Forward) and LEFT/RIGHT (Rotate)</p>
         <div className={styles.mapContainer}>
           <WorldMap width={mapWidth} height={mapHeight} cellDiameterPx={cellDiameterPx} />
           {footprints.map(fp => {
@@ -88,7 +95,7 @@ export default function IndexPage() {
         </div>
       </div>
       <div className={styles.infopanel}>
-        <InfoPanel location={robotData} onSendCommand={onSendCommand} />
+        <InfoPanel location={robotData} cmdDelay={cmdDelay} onSendCommand={onSendCommand} />
       </div>
     </div>
   )
