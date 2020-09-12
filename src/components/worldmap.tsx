@@ -1,20 +1,21 @@
 import styles from '../styles/worldmap.module.sass'
+import React from 'react'
 
 interface WorldMapProps {
   width: number
   height: number
-  cellDiameterPx: number
+  cellSizePx: number
 }
 
-export default function WorldMap(props: WorldMapProps) {
-  const { width, height, cellDiameterPx } = props
+function WorldMap(props: WorldMapProps) {
+  const { width, height, cellSizePx } = props
 
   return (
     <div
       className={styles.mapGrid}
       style={{
-        width: cellDiameterPx * width,
-        height: cellDiameterPx * height,
+        width: cellSizePx * width,
+        height: cellSizePx * height,
         gridTemplateColumns: `repeat(${height}, 1fr)`,
         gridTemplateRows: `repeat(${width}, 1fr)`
       }}>
@@ -24,13 +25,11 @@ export default function WorldMap(props: WorldMapProps) {
           new Array(height)
             .fill(null)
             .map((_, y) => (
-              <span
-                className={styles.cell}
-                key={`${x}-${y}`}
-                style={{ width: cellDiameterPx, height: cellDiameterPx }}
-              />
+              <span className={styles.cell} key={`${x}-${y}`} style={{ width: cellSizePx, height: cellSizePx }} />
             ))
         )}
     </div>
   )
 }
+
+export default React.memo(WorldMap)
